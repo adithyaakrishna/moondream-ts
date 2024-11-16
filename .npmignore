@@ -1,0 +1,10 @@
+src
+tests
+coverage
+.github
+.husky
+.eslintrc.js
+.prettierrc
+.gitignore
+jest.config.js
+tsconfig*.json
