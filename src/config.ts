@@ -17,7 +17,9 @@ export function getMaxTokens(): number {
     if (!isNaN(parsed) && parsed > 0) {
       return parsed;
     }
-    console.warn('Invalid MOONDREAM_MAX_TOKENS value. Using default value of 1024.');
+    console.warn(
+      'Invalid MOONDREAM_MAX_TOKENS value. Using default value of 1024.'
+    );
   }
   return 1024;
 }

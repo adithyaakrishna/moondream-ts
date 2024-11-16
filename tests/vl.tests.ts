@@ -1,12 +1,10 @@
-// tests/vl.test.ts
 import { VL } from '../src';
-import { CaptionOutput, QueryOutput } from '../src/types';
 
-// Mock fetch globally
 global.fetch = jest.fn();
 global.AbortController = jest.fn(() => ({
   abort: jest.fn(),
   signal: null,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 })) as any;
 
 describe('VL', () => {
@@ -14,13 +12,10 @@ describe('VL', () => {
   let mockImage: HTMLImageElement;
 
   beforeEach(() => {
-    // Reset all mocks
     jest.clearAllMocks();
-    
-    // Initialize VL
+
     vl = new VL();
 
-    // Create mock image
     mockImage = new Image();
     mockImage.src = 'data:image/jpeg;base64,/9j/4AAQSkZJRg==';
   });
@@ -51,7 +46,6 @@ describe('VL', () => {
       const result = await vl.caption(mockImage);
       expect(result.caption).toBe('A beautiful landscape');
 
-      // Verify request
       expect(global.fetch).toHaveBeenCalledWith(
         expect.stringContaining('/caption'),
         expect.objectContaining({
@@ -78,7 +72,7 @@ describe('VL', () => {
       });
 
       const result = await vl.caption(mockImage, 'normal', true);
-      
+
       if (typeof result.caption !== 'string') {
         let caption = '';
         for await (const chunk of result.caption) {
@@ -97,10 +91,12 @@ describe('VL', () => {
         json: async () => mockResponse,
       });
 
-      const result = await vl.query(mockImage, 'How many people are in the image?');
+      const result = await vl.query(
+        mockImage,
+        'How many people are in the image?'
+      );
       expect(result.answer).toBe('There are two people');
 
-      // Verify request
       expect(global.fetch).toHaveBeenCalledWith(
         expect.stringContaining('/query'),
         expect.objectContaining({
@@ -127,11 +123,11 @@ describe('VL', () => {
       });
 
       const result = await vl.query(
-        mockImage, 
-        'How many people are in the image?', 
+        mockImage,
+        'How many people are in the image?',
         true
       );
-      
+
       if (typeof result.answer !== 'string') {
         let answer = '';
         for await (const chunk of result.answer) {
@@ -147,12 +143,12 @@ describe('VL', () => {
       const shortTimeout = new VL({ timeout: 100 });
 
       (global.fetch as jest.Mock).mockImplementationOnce(
-        () => new Promise(resolve => setTimeout(resolve, 200))
+        () => new Promise((resolve) => setTimeout(resolve, 200))
       );
 
-      await expect(
-        shortTimeout.caption(mockImage)
-      ).rejects.toThrow('The operation was aborted');
+      await expect(shortTimeout.caption(mockImage)).rejects.toThrow(
+        'The operation was aborted'
+      );
     });
   });
 });

@@ -1,8 +1,8 @@
 export { VL } from './vl';
 export { getConfig, type Config } from './config';
-export type { 
+export type {
   SamplingSettings,
   EncodedImage,
   CaptionOutput,
-  QueryOutput 
+  QueryOutput,
 } from './types';

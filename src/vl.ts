@@ -1,4 +1,10 @@
-import { SamplingSettings, EncodedImage, CaptionOutput, QueryOutput, ClientConfig } from './types';
+import {
+  SamplingSettings,
+  EncodedImage,
+  CaptionOutput,
+  QueryOutput,
+  ClientConfig,
+} from './types';
 import { getConfig } from './config';
 
 export class VL {
@@ -8,7 +14,7 @@ export class VL {
 
   constructor(config: ClientConfig = {}) {
     const defaultConfig = getConfig();
-    
+
     this.baseUrl = config.baseUrl || defaultConfig.baseUrl;
     this.timeout = config.timeout || 30000;
     this.maxTokens = defaultConfig.maxTokens;
@@ -31,7 +37,9 @@ export class VL {
 
       if (!response.ok) {
         const error = await response.json().catch(() => ({}));
-        throw new Error(error.message || `HTTP error! status: ${response.status}`);
+        throw new Error(
+          error.message || `HTTP error! status: ${response.status}`
+        );
       }
 
       return response;
@@ -40,7 +48,9 @@ export class VL {
     }
   }
 
-  private async imageToBase64(image: ImageData | HTMLImageElement | File): Promise<string> {
+  private async imageToBase64(
+    image: ImageData | HTMLImageElement | File
+  ): Promise<string> {
     if (image instanceof File) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -53,7 +63,7 @@ export class VL {
     // For ImageData or HTMLImageElement, create a canvas to convert to base64
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
-    
+
     if (image instanceof HTMLImageElement) {
       canvas.width = image.width;
       canvas.height = image.height;
@@ -78,7 +88,9 @@ export class VL {
     return { base64 };
   }
 
-  private async* streamResponse(response: Response): AsyncGenerator<string, void, unknown> {
+  private async *streamResponse(
+    response: Response
+  ): AsyncGenerator<string, void, unknown> {
     const reader = response.body?.getReader();
     if (!reader) throw new Error('Response body is not readable');
 
@@ -87,7 +99,7 @@ export class VL {
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
-        
+
         const chunk = decoder.decode(value, { stream: true });
         yield chunk;
       }
@@ -98,7 +110,7 @@ export class VL {
 
   async caption(
     image: ImageData | HTMLImageElement | File | EncodedImage,
-    length: string = "normal",
+    length: string = 'normal',
     stream: boolean = false,
     settings?: SamplingSettings
   ): Promise<CaptionOutput> {
@@ -106,21 +118,18 @@ export class VL {
       const encodedImage = await this.encodeImage(image);
       const maxTokens = settings?.maxTokens || this.maxTokens;
 
-      const response = await this.fetchWithTimeout(
-        `${this.baseUrl}/caption`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            image: encodedImage.base64,
-            length,
-            stream,
-            max_tokens: maxTokens,
-          }),
-        }
-      );
+      const response = await this.fetchWithTimeout(`${this.baseUrl}/caption`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          image: encodedImage.base64,
+          length,
+          stream,
+          max_tokens: maxTokens,
+        }),
+      });
 
       if (stream) {
         return { caption: this.streamResponse(response) };
@@ -143,21 +152,18 @@ export class VL {
       const encodedImage = await this.encodeImage(image);
       const maxTokens = settings?.maxTokens || this.maxTokens;
 
-      const response = await this.fetchWithTimeout(
-        `${this.baseUrl}/query`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            image: encodedImage.base64,
-            question,
-            stream,
-            max_tokens: maxTokens,
-          }),
-        }
-      );
+      const response = await this.fetchWithTimeout(`${this.baseUrl}/query`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          image: encodedImage.base64,
+          question,
+          stream,
+          max_tokens: maxTokens,
+        }),
+      });
 
       if (stream) {
         return { answer: this.streamResponse(response) };

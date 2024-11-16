@@ -21,8 +21,7 @@
     "prepare": "husky install"
   },
   "keywords": ["ai", "vision", "language"],
-  "author": "vik <vik@moondream.ai>",
-  "license": "MIT",
+  "author": "Adithya Krishna <aadithya794@gmail.com >",
   "devDependencies": {
     "@types/jest": "^29.5.12",
     "@types/node": "^20.11.24",

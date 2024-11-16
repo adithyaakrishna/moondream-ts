@@ -4,9 +4,7 @@ export function normalize(
   std: number[] = [0.5, 0.5, 0.5]
 ): number[][][] {
   return image.map((channel, i) =>
-    channel.map(row =>
-      row.map(pixel => (pixel - mean[i]) / std[i])
-    )
+    channel.map((row) => row.map((pixel) => (pixel - mean[i]) / std[i]))
   );
 }
 
